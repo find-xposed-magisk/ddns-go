@@ -1,22 +1,25 @@
-# ddns-go
+# DDNS-GO
 
-[![GitHub release](https://img.shields.io/github/release/jeessy2/ddns-go.svg?logo=github&style=flat-square) ![GitHub release downloads](https://img.shields.io/github/downloads/jeessy2/ddns-go/total?logo=github)](https://github.com/jeessy2/ddns-go/releases/latest) [![Go version](https://img.shields.io/github/go-mod/go-version/jeessy2/ddns-go)](https://github.com/jeessy2/ddns-go/blob/master/go.mod) [![](https://goreportcard.com/badge/github.com/jeessy2/ddns-go/v5)](https://goreportcard.com/report/github.com/jeessy2/ddns-go/v5) [![](https://img.shields.io/docker/image-size/jeessy/ddns-go)](https://registry.hub.docker.com/r/jeessy/ddns-go) [![](https://img.shields.io/docker/pulls/jeessy/ddns-go)](https://registry.hub.docker.com/r/jeessy/ddns-go)
+[![GitHub release](https://img.shields.io/github/release/jeessy2/ddns-go.svg?logo=github&style=flat-square) ![GitHub release downloads](https://img.shields.io/github/downloads/jeessy2/ddns-go/total?logo=github)](https://github.com/jeessy2/ddns-go/releases/latest) [![Go version](https://img.shields.io/github/go-mod/go-version/jeessy2/ddns-go)](https://github.com/jeessy2/ddns-go/blob/master/go.mod) [![](https://goreportcard.com/badge/github.com/jeessy2/ddns-go/v6)](https://goreportcard.com/report/github.com/jeessy2/ddns-go/v6) [![](https://img.shields.io/docker/image-size/jeessy/ddns-go)](https://registry.hub.docker.com/r/jeessy/ddns-go) [![](https://img.shields.io/docker/pulls/jeessy/ddns-go)](https://registry.hub.docker.com/r/jeessy/ddns-go)
+
+中文 | [English](https://github.com/jeessy2/ddns-go/blob/master/README_EN.md)
 
 自动获得你的公网 IPv4 或 IPv6 地址，并解析到对应的域名服务。
 
-- [特性](#特性)
-- [系统中使用](#系统中使用)
-- [Docker中使用](#docker中使用)
-- [使用IPv6](#使用ipv6)
-- [Webhook](#webhook)
-- [Callback](#callback)
-- [界面](#界面)
-- [开发&自行编译](#开发自行编译)
+- [DDNS-GO](#ddns-go)
+    - [特性](#特性)
+    - [系统中使用](#系统中使用)
+    - [Docker中使用](#docker中使用)
+    - [使用IPv6](#使用ipv6)
+    - [Webhook](#webhook)
+    - [Callback](#callback)
+    - [界面](#界面)
+    - [开发\&自行编译](#开发自行编译)
 
 ## 特性
 
-- 支持Mac、Windows、Linux系统，支持ARM、x86架构
-- 支持的域名服务商 `Alidns(阿里云)` `Dnspod(腾讯云)` `Cloudflare` `华为云` `Callback` `百度云` `Porkbun` `GoDaddy` `Google Domain`
+- 支持Mac、Windows、Linux系统，支持ARM、x86、RISC-V架构
+- 支持的域名服务商 `阿里云` `阿里云 ESA` `腾讯云` `Dnspod` `Cloudflare` `华为云` `Callback` `百度云` `Porkbun` `GoDaddy` `Namecheap` `NameSilo` `Dynadot` `DNSLA` `时代互联` `Eranet` `Tnethk` `Gcore` `EdgeOne` `IBM NS1 Connect` `雨云`
 - 支持接口/网卡/[命令](https://github.com/jeessy2/ddns-go/wiki/通过命令获取IP参考)获取IP
 - 支持以服务的方式运行
 - 默认间隔5分钟同步一次
@@ -27,7 +30,7 @@
 - 网页中方便快速查看最近50条日志
 - 支持Webhook通知
 - 支持TTL
-- 支持部分DNS服务商[传递自定义参数](https://github.com/jeessy2/ddns-go/wiki/传递自定义参数)，实现地域解析等功能
+- 支持部分DNS服务商[传递自定义参数](https://github.com/jeessy2/ddns-go/wiki/传递自定义参数)，实现地域解析/多IP等功能
 
 > [!NOTE]
 > 建议在启用公网访问时，使用 Nginx 等反向代理软件启用 HTTPS 访问，以保证安全性。[FAQ](https://github.com/jeessy2/ddns-go/wiki/FAQ)
@@ -35,23 +38,37 @@
 ## 系统中使用
 
 - 从 [Releases](https://github.com/jeessy2/ddns-go/releases) 下载并解压 ddns-go
-- [可选] 使用 [Homebrew](https://brew.sh) 安装 [ddns-go](https://formulae.brew.sh/formula/ddns-go)：
-
-  ```bash
-  brew install ddns-go
-  ```
-
-- 双击运行, 如没有找到配置, 程序将自动打开 http://127.0.0.1:9876
-- [可选] 安装服务
+- 安装服务
   - Mac/Linux: `sudo ./ddns-go -s install`
   - Win(以管理员打开cmd): `.\ddns-go.exe -s install`
+- 配置
+  - 打开浏览器并访问`http://localhost:9876`进行初始化配置
 - [可选] 服务卸载
   - Mac/Linux: `sudo ./ddns-go -s uninstall`
   - Win(以管理员打开cmd): `.\ddns-go.exe -s uninstall`
-- [可选] 支持安装或启动时带参数 `-l`监听地址 `-f`同步间隔时间(秒) `-cacheTimes`间隔N次与服务商比对 `-c`自定义配置文件路径 `-noweb`不启动web服务 `-skipVerify`跳过证书验证 `-dns` 自定义 DNS 服务器。如：`./ddns-go -s install -l :9877 -f 600 -c /Users/name/ddns-go.yaml`
-
-> [!NOTE]
-> 通过合理的配置 `-f` 和 `-cacheTimes` 可以实现 IP 变化即时触发更新且不会被 DDNS 服务商限流, 例如 `-f 10 -cacheTimes 360` 效果为每 10 秒检查一次本地 IP 变化, 每小时去公网对比一下 IP 变化
+- [可选] 支持安装带参数
+  - `-l` 监听地址
+  - `-f` 同步间隔时间(秒)
+  - `-cacheTimes` 间隔N次与服务商比对
+  - `-c` 自定义配置文件路径
+  - `-noweb` 不启动web服务
+  - `-skipVerify` 跳过证书验证
+  - `-dns` 自定义 DNS 服务器
+  - `-resetPassword` 重置密码
+- [可选] 参考示例
+  - 10分钟同步一次, 并指定了配置文件地址
+    ```bash
+    ./ddns-go -s install -f 600 -c /Users/name/.ddns_go_config.yaml
+    ```
+  - 每 10 秒检查一次本地 IP 变化, 每 30 分钟对比一下 IP 变化, 实现 IP 变化即时触发更新且不会被服务商限流, 如果使用接口获取IP, 需要注意接口限流
+    ```bash
+    ./ddns-go -s install -f 10 -cacheTimes 180
+    ```
+  - 重置密码
+    ```bash
+    ./ddns-go -resetPassword 123456
+    ./ddns-go -resetPassword 123456 -c /Users/name/.ddns_go_config.yaml
+    ```
 
 ## Docker中使用
 
@@ -61,7 +78,7 @@
   docker run -d --name ddns-go --restart=always --net=host -v /opt/ddns-go:/root jeessy/ddns-go
   ```
 
-- 在浏览器中打开`http://主机IP:9876`，修改你的配置，成功
+- 打开浏览器并访问`http://Docker主机IP:9876`进行初始化配置
 
 - [可选] 使用 `ghcr.io` 镜像
 
@@ -81,6 +98,13 @@
   docker run -d --name ddns-go --restart=always -p 9876:9876 -v /opt/ddns-go:/root jeessy/ddns-go
   ```
 
+- [可选] 重置密码
+
+  ```bash
+  docker exec ddns-go ./ddns-go -resetPassword 123456
+  docker restart ddns-go
+  ```
+
 ## 使用IPv6
 
 - 前提：你的电脑或终端能正常获取IPv6，并能正常访问IPv6
@@ -98,14 +122,15 @@
 - 支持webhook, 域名更新成功或不成功时, 会回调填写的URL
 - 支持的变量
 
-  |  变量名   | 说明  |
-  |  ----  | ----  |
-  | #{ipv4Addr}  | 新的IPv4地址 |
-  | #{ipv4Result}  | IPv4地址更新结果: `未改变` `失败` `成功`|
-  | #{ipv4Domains}  | IPv4的域名，多个以`,`分割 |
-  | #{ipv6Addr}  | 新的IPv6地址 |
-  | #{ipv6Result}  | IPv6地址更新结果: `未改变` `失败` `成功`|
-  | #{ipv6Domains}  | IPv6的域名，多个以`,`分割 |
+  | 变量名         | 说明                                     |
+  | -------------- | ---------------------------------------- |
+  | #{ipv4Addr}    | 新的IPv4地址                             |
+  | #{ipv4Result}  | IPv4地址更新结果: `未改变` `失败` `成功` |
+  | #{ipv4Domains} | IPv4的域名，多个以`,`分割                |
+  | #{ipv6Addr}    | 新的IPv6地址                             |
+  | #{ipv6Result}  | IPv6地址更新结果: `未改变` `失败` `成功` |
+  | #{ipv6Domains} | IPv6的域名，多个以`,`分割                |
+  | #{timestamp}   | 当前 UTC+0 时间戳（秒）                  |
 
 - 如 RequestBody 为空则为 GET 请求，否则为 POST 请求
 - <details><summary>Server酱</summary>
@@ -208,6 +233,43 @@
     }
     ```
   </details>
+- <details><summary>微信</summary>
+
+  - 通过 [微信 ClawBot 协议](https://www.npmjs.com/package/@tencent-weixin/openclaw-weixin) 推送消息到微信
+  - 需要先通过协议获取 $your_bot_token 和 $your_user_id，可参考 [1](https://github.com/hao-ji-xing/openclaw-weixin/blob/main/weixin-bot-api.md)
+  - URL 中输入 `https://ilinkai.weixin.qq.com/ilink/bot/sendmessage`
+  - RequestBody 中输入
+    ```json
+    {
+        "msg": {
+            "from_user_id": "",
+            "to_user_id": "$your_user_id@im.wechat",
+            "client_id": "ddns-#{timestamp}",
+            "message_type": 2,
+            "message_state": 2,
+            "item_list": [
+                {
+                    "type": 1,
+                    "text_item": {
+                        "text": "📡 IPv4: #{ipv4Result}\n   新地址: #{ipv4Addr}\n   已绑定域名: #{ipv4Domains}\n\n📡 IPv6: #{ipv6Result}\n   新地址: #{ipv6Addr}\n   已绑定域名: #{ipv6Domains}"
+                    }
+                }
+            ]
+        },
+        "base_info": {
+            "channel_version": "2.1.7"
+        }
+    }
+    ```
+  - Headers 中输入
+    ```
+    Content-Type: application/json
+    AuthorizationType: ilink_bot_token
+    Authorization: Bearer $your_bot_token
+    iLink-App-Id: bot
+    iLink-App-ClientVersion: 131335
+    ```
+  </details>
 
 - [查看更多Webhook配置参考](https://github.com/jeessy2/ddns-go/issues/327)
 
@@ -217,12 +279,12 @@
 - 配置的域名有几行, 就会回调几次
 - 支持的变量
 
-  |  变量名   | 说明  |
-  |  ----  | ----  |
-  | #{ip}  | 新的IPv4/IPv6地址 |
-  | #{domain}  | 当前域名 |
-  | #{recordType}  | 记录类型 `A`或`AAAA` |
-  | #{ttl}  | ttl |
+  | 变量名        | 说明                 |
+  | ------------- | -------------------- |
+  | #{ip}         | 新的IPv4/IPv6地址    |
+  | #{domain}     | 当前域名             |
+  | #{recordType} | 记录类型 `A`或`AAAA` |
+  | #{ttl}        | TTL                  |
 - 如 RequestBody 为空则为 GET 请求，否则为 POST 请求
 - [Callback配置参考](https://github.com/jeessy2/ddns-go/wiki/Callback配置参考)
 
